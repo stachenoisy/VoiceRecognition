@@ -1,5 +1,5 @@
 # VoiceRecognition
-Voice Recognition from EvilRP
+Voice Recognition
 
 **Features**
 - Completely FREE (not using paid API's like Microsoft/IBM/Google)
