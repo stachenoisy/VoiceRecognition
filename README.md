@@ -32,7 +32,9 @@ Voice Recognition from EvilRP
 - pip install fastapi
 - pip install logging
 - pip install wit
-- pip install uvicorn
+- pip install ngrok
+- pip install pydantic
+- pip install pybase64
 
 **How to run the Speech Server**
 - Open a cmd (inside your speech_server folder) and run **uvicorn speech_server:app --workers 8**
