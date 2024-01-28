@@ -4,18 +4,30 @@ import os
 from wit import Wit
 import random
 import json
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, HTTPException, requests, File, UploadFile, Form, Depends, Body
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 import logging
 import threading
+import ngrok
+import base64
 from mutagen.mp3 import MP3
 logging.basicConfig(filename='WebServer.log', filemode='w', level=logging.DEBUG)
 
+DomainName="xxx-xxx.ngrok-free.app"
+ngrokToken="xxx-xxx-xxx"
+
+ngrok.set_auth_token(ngrokToken)
+listener = ngrok.forward(8000, domain=DomainName)
+
+print("Ingress established at " + DomainName)
+
 # System
-platform = "Windows"
+platform = "Linux"
 
 # Wit.ai API Keys (Multiple can be used in order to avoid rate-limit issues.)
 api_keys = [
-	"YOUR_API_KEY"
+	"test_fill",
 ]
 
 wit_api = {}
@@ -53,36 +65,56 @@ if platform == "Linux":
 	except Exception as e:
 		print(e)
 
-
 app = FastAPI()
+
+origins = ["*"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.route('/')
 def index(request: Request):
 	raise HTTPException(status_code=500)
 
+class FormData(BaseModel):
+    __root__: List[str] = []
+
 @app.post('/speech')
-async def process(request: Request):
+async def process(request: Request, Form: str = Body(...), voicesound: UploadFile = File(...)):
 	start_execution = time.time()
+
+	LocalApiKeys = json.loads(Form)["ApiKeys"] if json.loads(Form)["ApiKeys"] else []
 
 	# Request Processing
 	data_length = str(round(float(int(request.headers['content-length']) / 1024),2))
 	random_hash = random.randint(10000000000,99999999999)
 
 	# Don't allow big requests
-	if float(data_length) > 500:
-		print('The incoming speech request has exceeded the 500KB limit established by the Developer, Size: ' + str(data_length) + "KB")
+	if float(data_length) > 1000:
+		print('The incoming speech request has exceeded the 1000KB limit established by the Developer, Size: ' + str(data_length) + "KB")
 		return
 
 	print("[" + str(random_hash) + "] Speech request received from " + request.client.host + " | " + " Size of incoming data: " + data_length + "KB.")
 	logging.info("[" + str(random_hash) + "] Speech request received from " + request.client.host + " | " + " Size of incoming data: " + data_length + "KB.")
 
-	webm = await request.body()
+	if LocalApiKeys == None or LocalApiKeys == "" or len(LocalApiKeys) == 0:
+		print("[" + str(random_hash) + "] Invalid request received from " + request.client.host)
+		raise HTTPException(status_code=403, detail="Invalid request received. Code: 23x546")
+		return "Invalid request received. Code: 23x546"
+
 	logging.debug("[" + str(random_hash) + "] .webm obtained from the Body request.")
 
 	# File Writting
 	with open("Cache/" + str(random_hash) + ".webm", "wb") as file:
-		file.write(webm)
+		content = await voicesound.read()  # async read
+		file.write(content)
 		file.close()
+    
 	logging.debug("[" + str(random_hash) + "] .webm written to file " + str(random_hash) + ".webm")
 
 	# File Conversion
@@ -98,6 +130,7 @@ async def process(request: Request):
 	if platform == "Linux":
 		convert = subprocess.Popen(["ffmpeg","-i","/home/ubuntu/SpeechRecognition/Cache/" + str(random_hash) + ".webm","-af","silenceremove=stop_periods=-1:stop_duration=0.02:stop_threshold=-53dB","-vn","-ac","1","-b:a","64k","/home/ubuntu/SpeechRecognition/Cache/" + str(random_hash) + ".mp3"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 		convert.wait() 
+
 	logging.debug("[" + str(random_hash) + "] Conversion finished, time " + str(round(float((time.time() - start_time) * 1000),2)) + " msec")
 	
 	# File Open
