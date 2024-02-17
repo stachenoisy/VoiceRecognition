@@ -37,7 +37,7 @@ Voice Recognition
 - pip install pybase64
 
 **How to run the Speech Server**
-- Open a cmd (inside your speech_server folder) and run **uvicorn speech_server:app --workers 8**
+- Open a cmd (inside your speech_server folder) and run **python speech_server.py**
 
 However this is not mandatory is recommended to run this service behind Cloudflare or any other reverse proxy HTTP service.
 In order to send the requests from **FiveM** to your **speech_server.py**, you have in the **configuration.lua** the **Config.Endpoint** where requests will be sent to
