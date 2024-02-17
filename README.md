@@ -43,7 +43,7 @@ However this is not mandatory is recommended to run this service behind Cloudfla
 In order to send the requests from **FiveM** to your **speech_server.py**, you have in the **configuration.lua** the **Config.Endpoint** where requests will be sent to
 
 For example if you are running this within a domain/cloudflare/ngrok etc
-https://ngrok.free.domain.xxx/speech 
+https://xxx-xxx.ngrok-free.app/speech 
 
 
 This is completely open-source, you can fork it, recode it, re-style it, do whatever you want with it.   And yeah you are able to do PR if you can improve the code, as always I do those things for myself and then since I don't use them, I don't give support as much as I would do with any active project.
