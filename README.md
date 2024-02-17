@@ -42,11 +42,9 @@ Voice Recognition
 However this is not mandatory is recommended to run this service behind Cloudflare or any other reverse proxy HTTP service.
 In order to send the requests from **FiveM** to your **speech_server.py**, you have in the **configuration.lua** the **Config.Endpoint** where requests will be sent to
 
-For example if you are running this within a domain/cloudflare etc your **speech_server** listening port should be set to 80  
-https://voiceserver.roleplay.net/speech 
+For example if you are running this within a domain/cloudflare/ngrok etc
+https://ngrok.free.domain.xxx/speech 
 
-But if you are not using a domain/cloudflare your URL should be like this (make sure that you have your port TCP open)  
-http://163.210.34.39:8000/speech  
 
 This is completely open-source, you can fork it, recode it, re-style it, do whatever you want with it.   And yeah you are able to do PR if you can improve the code, as always I do those things for myself and then since I don't use them, I don't give support as much as I would do with any active project.
 
